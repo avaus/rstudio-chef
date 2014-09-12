@@ -1,3 +1,6 @@
 Berksfile.lock
 Gemfile.lock
 *.swp
+.Rproj.user
+rstudio-chef.Rproj
+.Rhistory
