@@ -10,13 +10,41 @@ when "ubuntu", "debian"
         distribution "#{node['lsb']['codename']}/"
     end
 
-    package "r-base" do
+    # package "r-base" do
+    #     action :install
+    # end
+
+    package "libssl0.9.8" do
         action :install
     end
 
-    package "rstudio-server" do
+    # Not sure if needed...
+    package "libapparmor1" do
         action :install
     end
+
+    # Copied from https://github.com/davidski/rstudio-chef/blob/b9d51677823f73ee9251cd9b10aac569ec346883/recipes/server.rb
+    Chef::Log.info('Retrieving RStudio Server file.')
+    remote_rstudio_server_file = "#{node['rstudio']['server']['base_download_url']}/rstudio-server-#{node['rstudio']['server']['version']}-#{node['rstudio']['server']['arch']}.deb"
+    local_rstudio_server_file = "#{Chef::Config[:file_cache_path]}/rstudio-server-#{node['rstudio']['server']['version']}-#{node['rstudio']['server']['arch']}.deb"
+    remote_file local_rstudio_server_file do
+        source remote_rstudio_server_file
+        action :create_if_missing
+#        not_if { ::File.exists?('/etc/init/shiny-server.conf') }
+    end
+    Chef::Log.info('Installing RStudio Server via dpkg.')
+    execute "install-rstudio-server" do
+        command "dpkg --install #{local_rstudio_server_file}"
+#        not_if { ::File.exists?('/etc/init/shiny-server.conf') }
+    end
+    # dpkg_package "rstudio-server" do
+    #     source local_rstudio_server_file
+    #     action :install
+    # end
+end
+
+when "redhat", "centos", "fedora"
+    Chef::Application.fatal!("Redhat based platforms are not yet supported")
 end
 
 service "rstudio-server" do
