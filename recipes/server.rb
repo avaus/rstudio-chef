@@ -41,7 +41,6 @@ when "ubuntu", "debian"
     #     source local_rstudio_server_file
     #     action :install
     # end
-end
 
 when "redhat", "centos", "fedora"
     Chef::Application.fatal!("Redhat based platforms are not yet supported")
