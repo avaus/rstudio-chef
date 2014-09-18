@@ -30,18 +30,17 @@ when "ubuntu", "debian"
     remote_file local_rstudio_server_file do
         source remote_rstudio_server_file
         action :create_if_missing
-#        not_if { ::File.exists?('/etc/init/shiny-server.conf') }
+        not_if { ::File.exists?('/etc/rstudio/rserver.conf') }
     end
     Chef::Log.info('Installing RStudio Server via dpkg.')
     execute "install-rstudio-server" do
         command "dpkg --install #{local_rstudio_server_file}"
-#        not_if { ::File.exists?('/etc/init/shiny-server.conf') }
+        not_if { ::File.exists?('/etc/rstudio/rserver.conf') }
     end
     # dpkg_package "rstudio-server" do
     #     source local_rstudio_server_file
     #     action :install
     # end
-
 when "redhat", "centos", "fedora"
     Chef::Application.fatal!("Redhat based platforms are not yet supported")
 end
@@ -57,7 +56,8 @@ template "/etc/rstudio/rserver.conf" do
     mode 0644
     owner "root"
     group "root"
-    notifies :restart, "service[rstudio-server]"
+    # Commented out, because this jammed the installation
+#    notifies :restart, "service[rstudio-server]"
 end
 
 template "/etc/rstudio/rsession.conf" do
@@ -65,5 +65,6 @@ template "/etc/rstudio/rsession.conf" do
     mode 0644
     owner "root"
     group "root"
-    notifies :restart, "service[rstudio-server]"
+    # Commented out, because this jammed the installation
+#    notifies :restart, "service[rstudio-server]"
 end
